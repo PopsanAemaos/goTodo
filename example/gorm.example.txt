@@ -1,0 +1,38 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	gorm.Model
+	Name string
+}
+
+func main() {
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		fmt.Println(err)
+		panic("failed to conect database")
+	}
+
+	db.AutoMigrate(&User{})
+
+	db.Create(&User{Name: "Popsan"})
+	r := gin.Default()
+	userHandler := UserHandler{db:db}
+	r.GET("/user", userHandler.User)
+	r.Run(":2020")
+}
+type UserHandler struct {
+	db *gorm.DB
+}
+func (h *UserHandler)User(c *gin.Context) {
+	var u User
+	h.db.First(&u)
+	c.JSON(200, u)
+}

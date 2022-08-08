@@ -1,0 +1,18 @@
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	r := gin.Default()
+	r.GET("/ping", pingpongHandler)
+	r.Run(":2020")
+}
+
+func pingpongHandler(c *gin.Context) {
+	c.JSON(
+		200, gin.H{
+			"message": "pong",
+		})
+}
